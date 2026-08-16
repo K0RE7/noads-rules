@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260816
 ! Expires: 1 day
-! Rules: 73
+! Rules: 79
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -227,5 +227,23 @@ sina.com.cn###SI_EDU_AD
 
 ! 2026-08-16 giga.de: two empty 25x5785 skyscraper rails, one down each side of the page, reserved and never filled
 giga.de##[class*="alice-root-header-ads__ad-container"]
+
+! 2026-08-16 moz.de, lr-online.de: nine named ad slots per page; the right skyscraper paints 160x600 and holds nothing
+moz.de,lr-online.de##.u-adSlot
+
+! 2026-08-16 otz.de: eight ad-slot wrappers, five painted, largest 980x270 and empty
+otz.de##.ad-slot-wrapper
+
+! 2026-08-16 freundin.de, instyle.de: six and seven "Anzeige" placements, every one painted, up to 1440x500
+freundin.de,instyle.de##[class*="ad_placement"]
+
+! 2026-08-16 ksta.de, express.de: a 300x621 sticky rail reading "ANZEIGE", empty, out of 18-21 ad containers
+ksta.de,express.de##.bg-ad-container
+
+! 2026-08-16 fussballdaten.de: five ad-label holders, three painted, largest 1030x301, no content
+fussballdaten.de##.ad-label-holder
+
+! 2026-08-16 prisma.de: a 970x300 placeholder with zero children — nothing in it at all
+prisma.de##.ads-with-placeholder
 
 ! END: empty ad slots left behind
