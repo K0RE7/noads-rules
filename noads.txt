@@ -1,399 +1,133 @@
 ! Title: NoAds Rules
-! Description: Rules the public lists do not cover, maintained alongside NoAds and validated against a live-render corpus. Layered ON TOP of EasyList, EasyPrivacy, uBlock Origin's uAssets and AdGuard German — not a replacement for any of them.
+! Last modified: 2026-08-16
+! Description: Gaps the big public lists do not cover, to be used along EasyList
 ! Homepage: https://github.com/K0RE7/noads-rules
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260816
 ! Expires: 1 day
-! Rules: 55
+! Rules: 58
 !
-! Every rule below carries the date it was added and the evidence for it. If a
-! rule's job is later done by an upstream list, it should be REMOVED from here
-! rather than left to rot — this list is a set of gaps, not a fork.
+! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
+! AdGuard German, never instead of them. Every rule was measured against a live
+! render before it was added. This list is a set of gaps, not a fork — when an
+! upstream list starts covering a rule, the rule gets deleted here.
 !
+! GitHub issues: https://github.com/K0RE7/noads-rules/issues
+! GitHub pull requests: https://github.com/K0RE7/noads-rules/pulls
 
-! === Ad-tech the upstream lists under-block ===
-! Mostly $important re-assertions over a domain-scoped @@ exception an upstream
-! list carries, plus provider-level ad-tech that upstream blocks third-party-only
-! and so misses when the publisher loads it first-party.
-!
-! 2026-07-04: EasyList carries a
-! domain-scoped exception (easylist.txt, "@@||g.doubleclick.net/gpt/pubads_impl_
-! $domain=accuweather.com|blastingnews.com|bloomberg.com|..." — ~20 publisher
-! domains) that un-blocks Google Publisher Tag's ad-serving/bidding engine
-! script specifically for those sites, while every other site still gets it
-! blocked by the generic "||g.doubleclick.net^" rule. That upstream exception
-! left a genuine, unfiltered ~36 KB ad-engine script loading full-size on
-! accuweather.com (and every other listed domain). $important re-asserts the
-! block over the upstream @@ exception; it does not touch the separate
-! tag/js/gpt.js path (already handled by ubo-privacy.txt's $redirect stub) or
-! any other g.doubleclick.net path, so gpt.js's own redirect/exception
-! behaviour on these domains is unchanged by this rule.
+! START: ad-tech the upstream lists under-block
+
+! 2026-07-04: EasyList @@-exempts GPT's ad-serving engine on ~20 publishers (accuweather.com, bloomberg.com) — ~36 KB, loading full-size
 ||g.doubleclick.net/gpt/pubads_impl_$important
 
-!
-! 2026-07-04: EasyList carries a companion domain-scoped exception
-! for the GPT *loader* — "@@||g.doubleclick.net/tag/js/gpt.js$script,xmlhttprequest,
-! domain=bloomberg.com|..." (~35 publisher domains, overlapping the list above) —
-! that un-blocks securepubads.g.doubleclick.net/tag/js/gpt.js on those sites, so
-! the loader runs full-size instead of getting ubo-privacy.txt's redirect stub
-! (2026-07-04 real-browser ad-gap sweep, bloomberg.com). This re-asserts the uBO
-! googletagservices_gpt.js redirect stub with $important, so those domains receive
-! the neutered (ad-free but functional) googletag shim rather than the live loader
-! — a redirect-to-stub, NOT a hard block, so ad-slot .js calls don't throw. Mirrors
-! the per-domain uBO rules for euronews.com/wralsportsfan.com (ubo-privacy.txt /
-! ubo-unbreak.txt), broadened to the full EasyList exception set. gpt.js only ever
-! serves Google Publisher Tag (no fonts/CSS/first-party content), so this is safe.
+! 2026-07-04: EasyList @@-exempts the GPT loader on ~35 publishers (bloomberg.com, ...), so it runs full-size instead of getting uBO's stub
+! Redirected to that stub rather than blocked, so ad-slot .js calls don't throw
 ||g.doubleclick.net/tag/js/gpt.js$script,redirect=googletagservices_gpt.js:5,important
 
-!
-! 2026-07-04: Axel Springer ad CDN + Azure ad-SDK (real-browser
-! non-clean pass, autobild.de). www.asadcdn.com ("Axel Springer AD CDN") serves
-! the display-ad rendering library under /adlib/ (pages/<site>.js + libmodules/*
-! — renderAd / fireRequest / extendSlot / renderedCallback / ... ad code); upstream
-! lists only cover asadcdn's /adlib/ scoped to sport1.de, so it loaded full-size on
-! autobild.de (and any other Axel Springer title). adsdkprod.azureedge.net is an ad
-! viewability/banner SDK (viewability/<ver>/banner.js) on a dedicated Azure
-! subdomain. Both blocked GENERALLY (not per-site): asadcdn PATH-scoped to /adlib/
-! so its non-ad assets (e.g. /pec/) are untouched; adsdkprod scoped to the ad-SDK
-! host only (a bare ||azureedge.net^ would hit shared Microsoft CDN).
+! 2026-07-04 autobild.de: Axel Springer's ad library (/adlib/ only, so asadcdn's other paths survive) and its Azure viewability SDK
+! Upstream covers asadcdn's /adlib/ only for sport1.de
 ||asadcdn.com/adlib/
 ||adsdkprod.azureedge.net^
 
-!
-! DoubleVerify ad-verification/measurement (viewability/fraud beacons). An upstream
-! @@-exception let it load full-size (34 KB) on bbc.co.uk; $important re-asserts the
-! block over that exception. Pure ad-tech, no first-party use.
+! DoubleVerify viewability/fraud beacons — an upstream @@ let it load full-size (34 KB) on bbc.co.uk
 ||pub.doubleverify.com^$important
 
-!
-! Sailthru / Marigold "Horizon" onsite marketing+email personalization tracker
-! (ak.sail-horizon.com on apnews.com, cnbc.com). Tracking domain, no user-facing
-! function; block the whole tracker domain generally.
+! Sailthru / Marigold "Horizon" onsite marketing tracker (apnews.com, cnbc.com) — no user-facing function
 ||sail-horizon.com^
 
-!
-! DELIBERATELY NOT blocked (considered + deferred): assets.adobedtm.com (Adobe
-! Launch/DTM tag manager, 5 sites) and connect.facebook.net (FB SDK) are DUAL-USE —
-! blanket-blocking them risks breaking site JS / social-login, and neither was
-! serving VISIBLE ads (cnbc.com renders fully ad-free with adobedtm loaded). Left to
-! upstream easyprivacy's scoped rules to honour NoAds' "don't break legit pages".
-!
-! 2026-07-05: seven PROVIDER-LEVEL ad-tech leaks from a 175-site
-! real-browser adgap sweep. Each survived because an upstream list carries a
-! domain-scoped @@-exception (or a party-typing miss) that un-blocked the provider
-! on some publisher; these re-assert the block generally (not per-site). Line/list
-! citations are against the shipped list copies. Connatix
-! (connatix.com — breaks huffpost's in-article video) and Google IMA
-! (imasdk.googleapis.com — hard block breaks video) were considered and REJECTED.
-!
-! IAS / Integral Ad Science viewability+fraud SDK. easylist blocks it
-! (||adsafeprotected.com^, easylist.txt) but un-blocks it via
-! @@||adsafeprotected.com/iasPET.$script,domain=independent.co.uk|reuters.com|wjs.com
-! (+ a vans-adapter @@ for gamingbible/ladbible). $important re-asserts the block
-! over those @@ exceptions. Pure ad-verification, no first-party use.
+! Not blocked on purpose: assets.adobedtm.com and connect.facebook.net are dual-use, and neither served a visible ad
+! A blanket block risks site JS and social login, so they are left to upstream's scoped rules
+
+! 2026-07-05: EasyList @@-exempts Integral Ad Science's iasPET on independent.co.uk, reuters.com, wsj.com, ladbible
 ||adsafeprotected.com^$important
 
-!
-! Condé Nast first-party ad server. easylist blocks it (||ads-static.conde.digital^,
-! easylist.txt) but un-blocks it via @@||ads-static.conde.digital^$domain=wired.com.
-! $important re-asserts the block; host-wide so it covers every Condé title
-! (wired, vogue, gq, newyorker, …), not just wired.com.
+! 2026-07-05: EasyList @@-exempts Condé Nast's own ad server for wired.com. Host-wide, so it covers every Condé title
 ||ads-static.conde.digital^$important
 
-!
-! Taboola native-ad / content-recommendation loader. easyprivacy blocks the domain
-! third-party-only (||taboola.com^$third-party, easyprivacy.txt), and multiple @@
-! exceptions un-block the libtrc loader — @@||taboola.com/libtrc/*/loader.js$domain=
-! dailymail.co.uk|foxsports.com (easyprivacy.txt), the German-publisher
-! @@||taboola.com/libtrc/$script,domain=bild.de|…|welt.de, and
-! @@||cdn.taboola.com/libtrc/$script,domain=vix.com (ubo-unbreak.txt). $important on
-! the CDN host re-asserts the block over those exceptions and, being host-wide (no
-! party type), also catches cdn.taboola.com loaded first-party (which the base
-! $third-party rule misses).
+! 2026-07-05: upstream blocks Taboola third-party-only and @@-exempts libtrc (dailymail.co.uk, foxsports.com, vix.com, the German press)
+! Host-wide, so it also catches cdn.taboola.com served first-party
 ||cdn.taboola.com^$important
 
-!
-! Rubicon / Magnite SSP prebid endpoint. easylist blocks the domain
-! (||rubiconproject.com^, easylist.txt) but many @@ exceptions un-block the prebid
-! dynamic loader — @@||micro.rubiconproject.com/prebid/dynamic/$script,domain=
-! dailypost.co.uk|dailystar.co.uk|mirror.co.uk (ubo-unbreak.txt) plus weather.com,
-! gamingbible, worldsurfleague, la7.it/ladbible/… (ubo + easylist). $important on the
-! micro. host re-asserts the block over those exceptions. Pure header-bidding SSP.
+! 2026-07-05: EasyList @@-exempts Rubicon/Magnite's prebid loader on mirror.co.uk, dailystar.co.uk, weather.com, la7.it and others
 ||micro.rubiconproject.com^$important
 
-!
-! Comscore / scorecardresearch measurement beacon. easyprivacy blocks it
-! third-party-only (||scorecardresearch.com^$third-party, easyprivacy.txt), so the
-! beacon leaks when loaded first-party (e.g. sb.scorecardresearch.com in first-party
-! context). Fix = DROP the party filter (host-wide block), NOT $important: the
-! shipped ||scorecardresearch.com/beacon.js$redirect stub (ubo-privacy.txt) serves a
-! neutered window.COMSCORE shim so pages calling COMSCORE.beacon() don't throw —
-! $important would override that redirect and hard-block beacon.js, re-breaking those
-! pages. A plain host block closes the first-party leak while the more-specific
-! beacon.js redirect still wins. (Verified via the running worker: sb.scorecardresearch
-! .com/beacon.js currently returns the uBO redirect stub, not the live beacon.)
+! 2026-07-05: Comscore's beacon leaks when a publisher serves it first-party — upstream is third-party-only
+! Deliberately not $important: the beacon.js redirect stub must keep winning, or COMSCORE.beacon() callers throw
 ||scorecardresearch.com^
 
-!
-! AdsWizz audio-ad SDK. easylist blocks it third-party-only
-! (||adswizz.com^$third-party, easylist.txt; ubo softens Peter-Lowe's list to
-! ||adswizz.com^$3p, ubo-unbreak.txt), so cdn.adswizz.com loaded first-party (e.g.
-! soundcloud.com) is missed. Host-scoped to cdn. and DELIBERATELY WITHOUT $important
-! so the legit streaming @@ exceptions on OTHER hosts (streaming.adswizz.com /
-! delivery-cdn-cf.adswizz.com / synchrobox.adswizz.com media, for deezer/tunein/
-! podbay/podbean) are untouched — cdn. carries the ad-serving code, not the audio.
+! 2026-07-05: AdsWizz's ad code on cdn. leaks when served first-party (soundcloud.com) — upstream is third-party-only
+! No $important, so the legitimate streaming exceptions on AdsWizz's other hosts stay intact
 ||cdn.adswizz.com^
 
-!
-! Cxense / Piano onsite personalization+profiling tracker. easyprivacy blocks the
-! domain (||cxense.com^, easyprivacy.txt) but @@ exceptions un-block the cx.js loader
-! per publisher — @@||cdn.cxense.com/cx.js$domain=mega.cl|itmedia.co.jp and
-! @@||cdn.cxense.com/cx.$script,domain=elconfidencial.com|journaldemontreal.com
-! (ubo-unbreak.txt); ubo also softens to ||cxense.com^$3p, missing cdn. first-party
-! (e.g. businessinsider). $important on the cdn. host re-asserts the block over those
-! exceptions. Pure profiling tracker, no user-facing function.
+! 2026-07-05: upstream @@-exempts Cxense/Piano's cx.js per publisher (mega.cl, itmedia.co.jp, elconfidencial.com, journaldemontreal.com)
+! and softens the domain rule to $3p, so cdn. first-party is missed
 ||cdn.cxense.com^$important
 
-! === Anti-adblock walls ===
-! Rules that keep a page readable when the publisher detects a blocker. Keyed on
-! the wall VENDOR wherever possible, so one rule covers every site embedding it.
-!
-!
-! 2026-07-04: anti-adblock-wall vendor network (html-load.com /
-! content-loader.com / css-load.com / error-report.com). Observed on
-! tomshardware.com (2026-07-04 non-clean row-by-row pass): an inline bootstrap
-! loads html-load.com/lib.js, which pulls per-session obfuscated payloads from
-! *.stg.html-load.com/session/<site>/... and rotating gibberish endpoints, renders
-! ads in an html-load iframe, and — when it can't confirm ads rendered — replaces
-! the article with a "Bitte erlauben Sie Werbung / Werbung zulassen" wall (support
-! address @error-report.com, "Fehler: Error: Timeout"). Upstream lists barely cover
-! it (only html-load.com $document,popup), so its fetch/document ad + detection
-! loads were un-blocked. These are DEDICATED anti-adblock/ad-injection domains with
-! no legitimate first-party use, so blocking the whole vendor is safe and GENERAL —
-! keyed on the vendor, NOT on tomshardware.com, so it defeats this wall on every
-! site that embeds this SaaS. Validated via CDP request-blocking on tomshardware:
-! with the vendor hard-blocked the article renders fully (8/8 reloads) with no wall
-! and no "can't load ads" fallback wall; lib.js never running means the wall's own
-! timeout UI can't appear. (The gibberish rotating domains are downstream of lib.js,
-! so blocking the stable infra domains stops them; live host A/B deferred to the
-! next redeploy — the wall is server-side/intermittent and would not re-fire on
-! demand during validation.)
+! END: ad-tech the upstream lists under-block
+
+! START: anti-adblock walls
+
+! 2026-07-04 tomshardware.com: Ad-Shield's own infrastructure. lib.js renders ads in its iframe, then walls the article when it can't
+! Dedicated anti-adblock hosts with no first-party use, so the vendor is blocked wholesale — one rule per site embedding the SaaS
 ||html-load.com^
 ||content-loader.com^
 ||css-load.com^
 ||error-report.com^
 
-!
-! 2026-07-05 (Ad-Shield realm-aware wall defeat): SUPERSEDES the
-! earlier 2026-07-04e ##^script approach, which was REMOVED here because it TRIGGERS
-! the wall instead of defeating it. Root cause, live-captured + deobfuscated on
-! autobild.de (2026-07-05): the vendor (Ad-Shield / ad-shield.io) ships a first-party
-!   <script id="<rand>" src="html-load.com/core.js" onload="<stage-1>" onerror="<stage-2>">
-! whose onload/onerror attributes are SELF-CONTAINED, runtime-decoded watchdog stages.
-! Each stage (a) BLANKS the page —
-!   setInterval(()=>{document.body.remove();document.body.innerHTML=""},100) — using the
-! MAIN-realm document, (b) builds a fullscreen error-report.com modal iframe, and (c)
-! escalates confirm("Please allow ads")→ location.reload()/redirect where the reload is
-! grabbed from an IFRAME realm (so a main-realm lock on `reload` can't reach it). It ALSO
-! checks `document.querySelector("script#<id>")` and throws "Cannot find html-load script"
-! (→ blank+modal) if the loader tag is gone — which is exactly why removing/serving-empty
-! the tag walls the page. So we do NOT touch the tag. Instead a NoAds-authored, non-trusted
-! scriptlet (`adshield.js`, deps: safe-self.fn; body in resources/local-scriptlets.json)
-! runs at document-start on the vendor's publisher set and denies the wall the MAIN-realm
-! primitives it needs: it makes document.body un-removable/un-blankable (survives re-hook),
-! forces confirm/alert/prompt to a safe no-op so no escalation is armed, neutralizes
-! location.reload()/report-host redirects, and keeps the report modal PRESENT-but-invisible
-! (so the vendor's own 1s visibility check passes and never fires the reload escalation).
-! The iframe-realm reload is never reached because the escalation is starved of a trigger.
-! Validated in a DIRECT Chrome with NoAds' network blocking replicated, POST-CONSENT, 6/6
-! reloads CLEAN (full article renders, ad-free, no wall/blank/redirect, zero dialogs) on
-! autobild.de and computerbild.de. Scoped to the known Ad-Shield publisher set (keeps the
-! body/dialog structural locks off unrelated sites). Pairs with the ||html-load.com^ etc.
-! network blocks above.
+! 2026-07-05 autobild.de, computerbild.de: Ad-Shield's loader tag blanks the page and escalates to a redirect from its own onload/onerror
+! Removing the tag TRIGGERS the wall, so it stays — the scriptlet denies the watchdog the main-realm primitives it needs instead
 autobild.de,computerbild.de,bild.de,tomshardware.com##+js(adshield, error-report.com)
 
-!
-! bild.de also gates a SERVER-SIDE wall: the homepage/article HTML embeds a config flag
-! "adBlockWallEnabled":true and its own first-party JS redirects to bild.de/adblockwall.html
-! ("Aufgrund Ihres Blockers zeigen wir BILD.de nicht an") when an adblocker is detected.
-! That decision is made from a server-rendered flag the scriptlet can't reach; the flip is
-! done in the response bytes by the $replace rule ALREADY carried in ubo-filters.txt:
-!   ||bild.de^$doc,replace=/"adBlockWallEnabled":true/"adBlockWallEnabled":false/
-! (parsed by noads-rewrite/src/replace.rs; unit-tested there). GAP-4 re-validated it live:
-! with the flag flipped bild.de renders the real homepage ("Aktuelle Nachrichten | BILD.de"),
-! 6/6 reloads, no adblockwall.html. Not duplicated here — noting the dependency only.
-!
-! 2026-07-05 (bild wall regression — non-trusted layer restoration): the
-! 2026-07-05 review engine found bild.de STILL walls in a real fresh-profile browser, because
-! the $replace above only reaches the flag if it's in the RAW document body, but modern bild
-! sets it in a runtime hydration state. uBO layers a SCRIPTLET fix on top —
-! `bild.de##+js(rpnt, script, "adBlockWallEnabled":true, …false)` (rewrite the inline
-! hydration <script> text) — but `rpnt` is the alias of `replace-node-text` and that alias is
-! NOT in our vendored resources, so uBO's rule silently no-ops. uBO's fourth layer,
-! `##+js(trusted-replace-argument, JSON.parse, …)`, is deliberately unavailable — NoAds drops
-! every trusted-* scriptlet (scriptlet_transform.rs; NoAds_Plan.md §426). So we re-assert the
-! inline-script layer with the CANONICAL, vendored, NON-trusted scriptlet name — same effect,
-! no alias dependency, no pin bump, no trusted permission. Pairs with the already-synced uBO
-! `json-prune` layer (CLIENT_STORE_INITIAL_STATE…adBlockWallEnabled). Live wall→no-wall A/B on
-! the next redeploy; if the flag proves unreachable by all three non-trusted layers, a
-! NoAds-authored bild-specific JSON.parse-hook local scriptlet is the fallback (not shipped
-! unless measured necessary).
+! bild.de sets its wall flag during hydration, out of reach of a response-body rewrite
+! uBO's inline-script layer names an alias that is not vendored here and silently no-ops, so it is re-stated under the canonical name
 bild.de##+js(replace-node-text, script, "adBlockWallEnabled":true, "adBlockWallEnabled":false)
 
-!
-! 2026-07-09 (bild wall — SECOND, flag-INDEPENDENT path: loader_light integrity
-! redirect). A 50-site real-Chrome (--attach :8080) iteration-1 sweep (tools/site-verify run
-! gap-iter1-2026-07-09) found bild.de STILL walls even though the adBlockWallEnabled flag IS now
-! flipped to false in the served bytes (confirmed by fetching the homepage through :8080 — the three
-! flag layers above work). Root cause, decoded from browser.log + session.har + the served HTML: the
-! wall has a second trigger that has nothing to do with the flag. bild loads
-!   <script src="https://html-load.com/sdk.js" onload="(async()=>{…})()" onerror="(async()=>{…})()">
-! NoAds serves sdk.js as an empty 200 stub (||html-load.com^ above). The inline handler runs a
-! postMessage handshake with the (now-dead) SDK; it fails, so the handler throws "Failed to load
-! website properly since html-load.com is tainted" and runs a destroy function that:
-!   (a) setInterval(()=>document.body.remove(), 100)          — continuously BLANKS the page,
-!   (b) fetch('https://error-report.com/report?type=loader_light_redirect…')  — already blocked,
-!   (c) o.href = 'https://www.bild.de/adblockwall.html'        — navigates to the WALL.
-! The adshield scriptlet's runtime body-freeze loses the timing race to (a)/(c). Both the onload and
-! onerror destroy functions begin with the byte-identical prefix `=async function(X){try{try{
-! localStorage.setItem`; injecting an early `return;` right after the opening brace neutralizes the
-! blank + report + redirect at the SOURCE (in the response bytes, before any of it runs), leaving the
-! already-rendered homepage intact. A static body rewrite beats the runtime scriptlet timing race for
-! this trigger and is flag-independent. Unit-tested in noads-rewrite/src/replace.rs
-! (neutralizes_bild_loader_light_redirect + real_noads_local_bild_loader_rule_parses_and_applies).
-! VALIDATED 2026-07-10 in the scoped dev-worker sandbox (noads-worker run --scoped --port 8081, mints via
-! the installed broker) with real Chrome over CDP-attach: 3/3 fresh-profile runs land on bild.de/ ("Aktuelle
-! Nachrichten | BILD.de", homepage renders behind the normal consent CMP), zero navigations to
-! /adblockwall.html -- vs the pre-fix redirect. NB the adBlockWallEnabled layers above are IRRELEVANT to real
-! browsers: bild serves adBlockWallEnabled:false NATIVELY to a real Chrome fingerprint (only curl/bots get
-! :true), so this loader_light destroy-fn is the SOLE real-browser wall trigger. Scoped to bild.de $doc.
-! Production MSI redeploy pending (dev-sandbox-proven).
+! 2026-07-09: bild.de has a second wall trigger that ignores the flag — with the SDK stubbed, an inline destroy fn blanks the body
+! and navigates to /adblockwall.html. An early return neutralizes it in the response bytes, before any of it runs
 ||bild.de^$doc,replace=/(=async function\([a-z]\)\{)(try\{try\{localStorage\.setItem)/${1}return;${2}/
 
-!
-! pornhub.com — the anti-adblock NAG BAR (`#abAlert`, 1424x26, "If you are having
-!   issues with video playback, please try disabling adblock"). Ads are blocked
-!   and the page is fully readable, so per the owner rubric this is a nag, not a
-!   wall — cosmetic only. The refreshed lists raised pornhub's cosmetic count
-!   from 2 to 8 and still none targets it. Hiding `#abAlert` also collapses its
-!   `.abAlertShown` wrapper to height 0, so no residual strip is left; body text
-!   -120 chars (exactly the nag), media unchanged. Scoped to pornhub.com alone —
-!   the same bar plausibly ships on the other Aylo tubes, but that was not
-!   measured here and a cosmetic rule should not be guessed onto a domain.
+! pornhub.com's anti-adblock nag bar. Ads are blocked and the page is fully readable, so this is a nag rather than a wall — cosmetic only
 pornhub.com###abAlert
 
-! === First-party and native ad slots ===
-! Cosmetic rules for ad slots served from the publisher's own domain, which
-! network rules cannot reach. Each was confirmed against a live render.
-!
-!
-! 2026-07-05: gaps from a 47-site real-browser adgap sweep (consent
-! accepted, banner-verified screenshots). NoAds blocked ~everything; these are the
-! evidence-backed, PROVIDER-LEVEL (not per-site) gaps that survived.
-!
-! 2026-07-10 (Burda "Quadro" — network block RETRACTED, replaced by cosmetic
-! rules). The old rule here was `||quadro.burda-forward.de^`, justified as "the Burda ad
-! server … No breakage risk". That was WRONG: quadro.burda-forward.de is Burda's shared
-! IMAGE CDN and serves editorial photos and native-ad creatives over the SAME url shape
-! (`/ctf/<uuid>.<uuid>.jpeg?im=Region…`), same resource type, same sizes. Blocking the host
-! makes NoAds answer 200 with a zero-byte body, so every <img> decodes to naturalWidth 0.
-! Measured through the deployed worker vs DIRECT (2026-07-10): focus.de 3 broken / 0 direct
-! (incl. the lead photo), chip.de 14 broken / 0 direct. Editorial images served by quadro on
-! one page load: chip.de 163, focus.de 47, bunte.de 378. No path/type/size discriminator
-! exists, so no network rule — and no `@@…$image` exception — can separate the ads from the
-! photos. The ads are first-party-served native "Anzeige" teasers, so the correct instrument
-! is cosmetic hiding of the teaser element.
-!
-! Markers below were measured DIRECT on live homepages (matched / sponsored / editorial),
-! "sponsored" = the container owns a leaf text node reading exactly "Anzeige"/"Werbung":
-!   chip.de   article:has(div.RUC-Badge--Secondary)          13 / 13 / 0  (of 167 articles)
-!   bunte.de  article:has(div.RUC-TeaserBadge-Ad)            14 / 14 / 0
-!   focus.de  article.StageCarousel-Item--FixedTeaserSlot    12 / 12 / 0
-!   chip.de   article.StageCarousel-Item--FixedTeaserSlot     8 /  8 / 0
-!   focus.de  article.BlockItem--Article--FixedTeaserSlot     5 /  5 / 0
-! Both badges' own text is exactly "Anzeige" — Burda's design system labels the ad itself, so
-! this is a marker by construction, not an inference. The badge class name differs per title
-! (design-system drift), hence separate rules; hiding the badge alone would leave the ad
-! standing, so the rule climbs to the <article>. Never key on the bare carousel/teaser class:
-! `article.StageCarousel-Item` matches 127 on focus.de, of which 115 are editorial.
-! The focus.de rules duplicate adguard-german.txt:1690+ on purpose — we broke these pages, so
-! the repair must not depend on a third-party list keeping a matching rule.
-! tvspielfilm.de and cinema.de make ZERO quadro requests (the old comment's "whole publisher
-! family" claim was overstated); finanzen100.de was observed serving only editorial from it.
+! END: anti-adblock walls
+
+! START: first-party and native ad slots
+
+! 2026-07-10 chip.de, bunte.de, focus.de: Burda serves native "Anzeige" teasers from the SAME image CDN as its editorial photos
+! No network rule can separate the two, so the ad is hidden at the <article>, keyed on Burda's own ad badge
 chip.de##article:has(div.RUC-Badge--Secondary)
 bunte.de##article:has(div.RUC-TeaserBadge-Ad)
 chip.de,focus.de##article.StageCarousel-Item--FixedTeaserSlot
 focus.de##article.BlockItem--Article--FixedTeaserSlot
 
-!
-! 2026-07-05 (first-party / native ads): the rendered-ad audit
-! found publisher-SERVED creatives (an <img> in an "Anzeige"/"Werbung"/"Advertisement"-
-! labelled slot, with NO blockable third-party request) that the network classifier
-! can't see. The fix is cosmetic element-hiding. NoAds does NOT ship AdGuard's
-! GermanFilter/BaseFilter, where these load-bearing rules live, so we port the verified
-! ones here. Every rule below is DOMAIN-SCOPED and was ground-truthed against the LIVE
-! DOM through the running worker (querySelectorAll match count > 0 on the leaking ad
-! slot, 0 on editorial) before inclusion — no un-anchored label rules, no editorial
-! collisions. Sites: spiegel/gala/heise + the seven below.
-!
-! wetter.com — native "ANZEIGE" newsfeed teasers + display slots all carry the
-! `.adRelative` marker class (live: 6 matches — 2 empty `ad-flex werbung adRelative`
-! display boxes + 4 "Tipp:… ANZEIGE" teaser anchors; 0 editorial). Preferred over
-! AdGuard's brittle `div[class^="app-layout pb--"][class$="werbung"]` (the live class
-! order is `app-layout werbung pb`, so that rule matches nothing) AND over bare
-! `.app-layout.werbung`, which the live DOM proves also tags an EDITORIAL news block.
+! 2026-07-05 wetter.com: native "ANZEIGE" newsfeed teasers and display slots both carry .adRelative (6 live matches, 0 editorial)
 wetter.com##.adRelative
 wetter.com##div[data-ad-type]
 
-!
-! giga.de — Alice-CMS ad containers (semantic, ad-only class/attr names; live: present
-! as collapsed empty slots, editorial `.alice-teaser` deliberately NOT touched). The
-! `:has` rule hides the native "nativendo" ad list item. From AdGuard GermanFilter.
+! 2026-07-05 giga.de, familie.de: Alice-CMS ad containers; the :has rule hides the native "nativendo" list item
 giga.de,familie.de##.alice-adslot
 giga.de##div[data-sdg-ad]
 giga.de##div[data-item="ads-container"]
 giga.de##li:has(> div[data-role="alice-nativendo"]:only-child)
 
-!
-! slate.com — `.global-footer__ad` (live: 1 visible "Advertising AdChoices" footer ad)
-! + AdGuard's article-page ad slots. The audit's `.hp-top-shelf`/`.hp-bottom-shelf`
-! hits were EDITORIAL story shelves (live txt = headlines) — a scanner false positive,
-! deliberately NOT hidden. From AdGuard BaseFilter.
+! 2026-07-05 slate.com: the footer ad (1 live visible "Advertising AdChoices") plus the article-page ad slots
 slate.com##.global-footer__ad
 slate.com##.ad--lngtd
 slate.com##.ad--inArticleBanner
 
-!
-! apnews.com — `.Advertisement` is the literal ad-slot class (live: 23 collapsed empty
-! slots after the ad request is blocked; hiding removes the reserved gap + label).
-! `.FeedAd` = the in-feed variant. From AdGuard BaseFilter.
+! 2026-07-05 apnews.com: .Advertisement is the literal ad-slot class — 23 empty slots survive the block. .FeedAd is the in-feed variant
 apnews.com##.Advertisement
 apnews.com##.FeedAd
 
-!
-! aol.com / aol.de — the "From our Partners" Taboola/partner module (live on aol.de:
-! `.m-taboola` = 1). The audit's `.aol-grid` hit was the EDITORIAL page grid (live: 8
-! news blocks) — a false positive, deliberately NOT hidden. `.m-partner` is the
-! aol.com-proper equivalent (AdGuard BaseFilter). aol.com 302-redirects to aol.de, so
-! both are scoped.
+! 2026-07-05 aol.com, aol.de: the "From our Partners" Taboola/partner module
 aol.com,aol.de##.m-taboola
 aol.com,aol.de##.m-partner
 
-!
-! azlyrics.com — leaderboard ad wrapper (live: `.lboard-wrap` = 1 empty 1425x311 banner
-! slot) + `.ringtone` ringtone-ad block. From AdGuard BaseFilter.
+! 2026-07-05 azlyrics.com: the leaderboard ad wrapper (1 live empty 1425x311 banner slot) and the ringtone-ad block
 azlyrics.com##.lboard-wrap
 azlyrics.com##.ringtone
 
-!
-! cointelegraph.com — the audit's "Sponsored" hits were scanner false positives (the
-! page's "Sponsored" SECTION label bleeding onto the <header> + article flex-lists);
-! the real ad slots (`ad-slot_*`, leaderboard, listing banners) were already fully
-! suppressed by NoAds on every live load, so no creative leak was reproducible. These
-! AdGuard BaseFilter selectors are semantically ad-ONLY (CSS-module `ad-slot_*` hashes,
-! promo/leaderboard/listing-banner containers) with no editorial-collision risk, shipped
-! defensively so any slot that does render is hidden. No bare/procedural `:upward` or
-! `.banner-blocked` rules ported (can't be blind-validated here).
+! 2026-07-05 cointelegraph.com: CSS-module ad-slot hashes and the promo/leaderboard/listing-banner containers
 cointelegraph.com##div[class*="ad-slot_"]
 cointelegraph.com##.layout__leaderboard
 cointelegraph.com##.post-preview-item-banner
@@ -401,110 +135,49 @@ cointelegraph.com##.posts-listing__bnr
 cointelegraph.com##.stretch-promo-banner
 cointelegraph.com##.xgo-banner
 
-!
-! spiegel.de / gala-family / heise. These are
-! AdGuard GermanFilter's load-bearing native-ad rules for the confirmed leaking sites;
-! every selector is literally ad-NAMED (data-area "block>adblock", class "adtag",
-! data-component "AdModule") so editorial-collision risk is nil. Domain-scoped. Live-DOM
-! re-verified in the post-redeploy validation sweep (ad-audit on spiegel/gala/heise).
+! 2026-07-05 spiegel.de, the gala family, heise.de: literally ad-named containers, so editorial-collision risk is nil
 spiegel.de,manager-magazin.de##section[data-area="block>adblock"]
 gala.de,stern.de,brigitte.de,vorname.com,urbia.de##.group--adtag-with-fallbackcontent
 heise.de##section[data-component="AdModule"]
 
-!
-! 2026-08-04: three uncollapsed ad slots left holding space after the ad was
-! blocked. Found by hand during the 50-site engine-gap pass (harden50-2026-08-04)
-! and re-verified on 0.1.15 with the refreshed lists — the 2026-08-04 seed
-! refresh collapsed 10 of the 12 slots that pass found, but not these three.
-!
-! In every case NoAds blocked the ad correctly and the page reads fine; what is
-! left is a provably blank box that still reserves layout. All three were
-! measured with the DC-decoder over the stored full-page shot (sd = 0..0.67, one
-! distinct luma value across the box), and each rule below was validated against
-! the live DOM before being written: exactly ONE match, that match carrying zero
-! text and zero media, and applying `display:none !important` to it losing no
-! body text and no images.
-!
-! chefkoch.de — `div.recipesOfTheDay__ad-container`, 300x568, sd = 0. No rule for
-!   it exists in ANY shipped list (re-checked after the refresh), so this is a
-!   missing upstream rule, not an engine defect. It sits as an empty 300px column
-!   inside a flex row beside the recipe cards, so hiding it reflows the row
-!   rather than shortening the page — page height 9052 -> 9052, body text
-!   8791 -> 8791, media 156 -> 156.
+! 2026-08-04 chefkoch.de: a 300x568 blank box that still reserves layout after the ad is blocked, and which no shipped list covers
 chefkoch.de##.recipesOfTheDay__ad-container
 
-!
-! hbr.org — 1210x318, sd = 0.67. EasyList DOES carry a rule,
-!   `hbr.org##.AdSlotZone_ad-container__eXYUj`, but the live class is
-!   `AdSlotZone-module-scss-module__ASFKAa__ad-container`: the CSS-module build
-!   hash rotated and the upstream rule was never updated, so its selector cannot
-!   match. Deliberately matched on the two STABLE fragments either side of the
-!   hash rather than on a new hash, so the next rotation does not silently
-!   re-open this. Verified: 1 match, page height 5133 -> 4815 (-318), body text
-!   and media unchanged.
+! 2026-08-04 hbr.org: EasyList's rule pins a CSS-module hash that has rotated, so it cannot match this 1210x318 blank slot
+! Matched on the stable fragments either side of the hash instead, so the next rotation does not silently re-open it
 hbr.org##[class*="AdSlotZone"][class*="ad-container"]
 
-! === Surrogate redirects ===
-! Neutered stand-ins for tracker scripts whose absence breaks the page.
-!
-!
-! 2026-07-30: surrogate redirects for two trackers that had NO stub at all.
-!
-! NoAds answers a blocked request with a synthetic `200 OK` + empty body
-! (NoAds answers a blocked request with a synthetic response — a 4xx
-! or a network-level failure would produce browser error pages and is itself an
-! anti-adblock detection signal). A 200 makes a <script> element fire `load`,
-! NOT `error`. Both bootstraps below install their initialisation INSIDE that
-! onload handler, so with no stub the callback runs against a global that was
-! never defined and the page throws:
-!
-!   bat.bing.com/bat.js        -> `ReferenceError: UET is not defined`
-!                                 (filehippo.com x7 runs, softonic.com, wsj.com)
-!   *.imrworldwide.com/v60.js  -> `ReferenceError: nol_t is not defined`
-!                                 (wsj.com, via Tealium's Nielsen tag)
-!
-! Under an extension blocker the request fails at the network layer, `onerror`
-! fires, and neither throw happens — i.e. this error class is manufactured by the
-! proxy block style, which is why the fix is a redirect-to-stub rather than a
-! change to the block path. Redirecting instead of blocking sends the SAME zero
-! tracking data: every stub method is a no-op and no request leaves the browser.
-! Stub bodies are NoAds-authored surrogates.
-! (noads_bing_uet.js / noads_nielsen.js), NoAds-authored — uBO has no equivalent.
+! END: first-party and native ad slots
+
+! START: surrogate redirects
+
+! 2026-07-30: both of these initialise inside their own script's onload, so a blocked-but-successful response runs the callback anyway
+! Seen as "UET is not defined" (filehippo.com, softonic.com, wsj.com) and "nol_t is not defined" (wsj.com, via Tealium's Nielsen tag)
+! A no-op stub sends exactly the same zero tracking data as a block
 ||bat.bing.com/bat.js$script,redirect=noads_bing_uet.js
 ||imrworldwide.com/v60.js$script,redirect=noads_nielsen.js
 
-! === Unbreak ===
-! Narrow exceptions where a block above (or upstream) broke real functionality.
-!
-!
-! 2026-07-22: NoAds' own change broke
-! these, so unbreaking them is the
-! blocker's own responsibility.
-!
-! A 2026-07-22 change gave iframe requests their own `ContentType::Subdocument` instead of
-! folding them into `Other`. Upstream carries a small number of `$other`-scoped
-! EXCEPTION rules that were, in practice, exempting IFRAMES — they only worked
-! because every iframe used to land in the `Other` bucket. Now that those
-! requests are typed `subdocument`, the `$other` exceptions no longer apply and
-! the frames get blocked, which is the un-blocking/page-breakage direction the
-! ticket's LOST-blocks analysis was meant to surface.
-!
-! Both cases below were CONFIRMED on the live 0.1.3 install, not inferred: the
-! request returns a 0-byte synthetic when sent with `sec-fetch-dest: iframe`
-! and the real upstream body without it. These two mirror the upstream
-! exceptions with the now-correct type so behaviour returns to what the
-! upstream list authors intended. They are deliberately narrow — same host,
-! same path shape, same `domain=` scope as the upstream rule; no new site is
-! exempted, and the ad itself is still blocked everywhere the upstream rule
-! did not exempt it.
-!
-! Only these two of the 17 `$other`-scoped rules in the shipped lists needed it;
-! the rest either list `subdocument` explicitly already or cover
-! media/xhr/script requests that never took the iframe path.
-!
-! ubo-unbreak.txt: "@@||tpc.googlesyndication.com/safeframe/*/container.html$other,domain=abola.pt"
-@@||tpc.googlesyndication.com/safeframe/*/container.html$subdocument,domain=abola.pt
+! END: surrogate redirects
 
-! adguard-german.txt: "@@||ad3.adfarm1.adition.com^$domain=servustv.com,other"
+! START: unbreak
+
+! 2026-07-22: two upstream $other-scoped exceptions were in practice exempting IFRAMES, and stopped applying once iframes got their own type
+! Re-stated with the correct type — same host, same path shape, same domain= scope, so no new site is exempted
+@@||tpc.googlesyndication.com/safeframe/*/container.html$subdocument,domain=abola.pt
 @@||ad3.adfarm1.adition.com^$subdocument,domain=servustv.com
 
+! END: unbreak
+
+! START: client-rendered ad slots
+
+! 2026-08-16 theverge.com: 27 .m-ad slots on the homepage, 14 of them painted, largest 300x160
+! EasyList's generic ##.m-ad never fires here: the class is added at hydration, so the served HTML never carries the token
+theverge.com##.m-ad
+
+! 2026-08-16 aol.com: the video.js IMA3 ad container renders 543x407 and EMPTY once its ad is blocked, over the player
+aol.com##.vjs-ima3-ad-container
+
+! 2026-08-16 cnet.com, speedtest.net: the AdChoices floating button outlives its ad as a 27x25 fixed icon
+cnet.com,speedtest.net###zdcFloatingBtn
+
+! END: client-rendered ad slots
