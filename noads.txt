@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260816
 ! Expires: 1 day
-! Rules: 58
+! Rules: 72
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -181,3 +181,48 @@ aol.com##.vjs-ima3-ad-container
 cnet.com,speedtest.net###zdcFloatingBtn
 
 ! END: client-rendered ad slots
+
+! START: empty ad slots left behind
+
+! 2026-08-16 thesun.co.uk: 6 billboard modules, largest 1440x330, each labelled "Advertisement" and containing nothing
+thesun.co.uk##.module--1-billboard
+
+! 2026-08-16 bloomberg.com: 25 ad containers, 6 painted, largest 1425x288, no text in any of them
+bloomberg.com##[class^="media-ui-BaseAd_baseAd"]
+
+! 2026-08-16 usnews.com: 25 ad containers, 14 painted, largest 1180x110, no text
+usnews.com##[class^="Ad__Container-sc-"]
+
+! 2026-08-16 cnn.com: .container__ads 49 nodes, 3 painted to 438x294; .zone__ads 8 nodes, 4 painted to 1361x134
+! Both hold nothing but an "Ad Feedback" link once the creative is blocked
+cnn.com##.container__ads
+cnn.com##.zone__ads
+
+! 2026-08-16 sport1.de: 12 s1-ad-container nodes, 6 painted, largest 339x333, all empty
+sport1.de##.s1-ad-container
+
+! 2026-08-16 rtl.de: two 301x400 Outbrain slots, painted and completely empty
+rtl.de##[class^="AdSlot_outbrainWrapper"]
+
+! 2026-08-16 foodnetwork.com: two 1425x64 ad modules, painted, no content
+foodnetwork.com##.module--ad-module-primary
+
+! 2026-08-16 nicovideo.jp: a 316x266 slot with zero children — the emptiest box in the corpus
+nicovideo.jp###pc_uni_top_300x250_east
+
+! 2026-08-16 twitch.tv: the 1185x350 headliner ad, labelled "Werbung"
+twitch.tv##.headliner-ad
+
+! 2026-08-16 aol.com: two 1360x290 and 1360x130 boxes reading "Advertisement", plus a 300x491 rail slot
+aol.com,aol.de##.em-module:has(.m-gam)
+
+! 2026-08-16 uol.com.br: 5 labelled ad areas, largest 1190x404 — mostly empty, one filled with UOL's own product promos
+uol.com.br##.advertisementArea--showLabel
+
+! 2026-08-16 n-tv.de: the 902x290 "Partner-Service" module, an Anzeige-labelled block of 25 paid links
+n-tv.de##[class^="widget-menu-ads-linklist_wrapper"]
+
+! 2026-08-16 sina.com.cn: a 240x239 box named SI_EDU_AD carrying Taobao promo links
+sina.com.cn###SI_EDU_AD
+
+! END: empty ad slots left behind
