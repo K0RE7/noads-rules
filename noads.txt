@@ -1,7 +1,7 @@
 ! Title: NoAds Rules
 ! Description: Rules the public lists do not cover, maintained alongside NoAds and validated against a live-render corpus. Layered ON TOP of EasyList, EasyPrivacy, uBlock Origin's uAssets and AdGuard German — not a replacement for any of them.
 ! Homepage: https://github.com/K0RE7/noads-rules
-! License: GPL-3.0-or-later
+! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260816
 ! Expires: 1 day
 ! Rules: 55

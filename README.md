@@ -42,5 +42,5 @@ those don't cover.
 Maintained alongside NoAds, a local ad blocker for Windows that isn't public yet. The list is
 plain filter data with no dependency on it — anyone can subscribe today.
 
-Licensed **GPL-3.0-or-later**, matching the uAssets/EasyList convention so rules can move in
-either direction.
+Licensed **GPL-3.0** (see [LICENSE](LICENSE)), matching the uAssets/EasyList convention so rules
+can move in either direction.
