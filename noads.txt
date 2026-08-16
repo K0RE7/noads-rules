@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260816
 ! Expires: 1 day
-! Rules: 79
+! Rules: 80
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -16,6 +16,10 @@
 ! GitHub pull requests: https://github.com/K0RE7/noads-rules/pulls
 
 ! START: ad-tech the upstream lists under-block
+
+! 2026-08-16 echo-online.de: VRM's own ad server delivers 9 creatives, 371 KB, including a 165 KB image — nothing covers the host
+! Upstream already blocks two other meine-vrm.de subdomains, so the intent is settled; this one is simply missing
+||ad.meine-vrm.de^
 
 ! 2026-08-16: Reach plc's Mantis platform loads ~150-170 KB TWICE per page on 11 UK regional titles and no list covers this domain
 ! EasyPrivacy and AdGuard Tracking already block ||loader.mantis-intelligence.com^$3p — the intent is settled, they just lack this domain
