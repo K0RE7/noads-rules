@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260816
 ! Expires: 1 day
-! Rules: 72
+! Rules: 73
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -224,5 +224,8 @@ n-tv.de##[class^="widget-menu-ads-linklist_wrapper"]
 
 ! 2026-08-16 sina.com.cn: a 240x239 box named SI_EDU_AD carrying Taobao promo links
 sina.com.cn###SI_EDU_AD
+
+! 2026-08-16 giga.de: two empty 25x5785 skyscraper rails, one down each side of the page, reserved and never filled
+giga.de##[class*="alice-root-header-ads__ad-container"]
 
 ! END: empty ad slots left behind
