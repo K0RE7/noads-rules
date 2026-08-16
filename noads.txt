@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260816
 ! Expires: 1 day
-! Rules: 80
+! Rules: 79
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -220,11 +220,10 @@ twitch.tv##.headliner-ad
 ! 2026-08-16 aol.com: two 1360x290 and 1360x130 boxes reading "Advertisement", plus a 300x491 rail slot
 aol.com,aol.de##.em-module:has(.m-gam)
 
-! 2026-08-16 uol.com.br: 5 labelled ad areas, largest 1190x404 — mostly empty, one filled with UOL's own product promos
-uol.com.br##.advertisementArea--showLabel
-
-! 2026-08-16 n-tv.de: the 902x290 "Partner-Service" module, an Anzeige-labelled block of 25 paid links
-n-tv.de##[class^="widget-menu-ads-linklist_wrapper"]
+! 2026-08-16 uol.com.br: four labelled ad areas standing empty, largest 1190x404 — textContent is literally ""
+! Excludes .cardProducts: that one is FILLED with UOL's own products — UOL Host, PagBank, cinema/streaming
+! The publisher's own business, not an ad we blocked, so not ours to hide
+uol.com.br##.advertisementArea--showLabel:not(.cardProducts)
 
 ! 2026-08-16 sina.com.cn: a 240x239 box named SI_EDU_AD carrying Taobao promo links
 sina.com.cn###SI_EDU_AD
