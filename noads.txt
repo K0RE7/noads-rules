@@ -1,11 +1,11 @@
 ! Title: NoAds Rules
-! Last modified: 2026-08-16
+! Last modified: 2026-08-17
 ! Description: Gaps the big public lists do not cover, to be used along EasyList
 ! Homepage: https://github.com/K0RE7/noads-rules
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
-! Version: 20260816
+! Version: 20260817
 ! Expires: 1 day
-! Rules: 80
+! Rules: 81
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -84,7 +84,7 @@
 
 ! 2026-07-05 autobild.de, computerbild.de: Ad-Shield's loader tag blanks the page and escalates to a redirect from its own onload/onerror
 ! Removing the tag TRIGGERS the wall, so it stays — the scriptlet denies the watchdog the main-realm primitives it needs instead
-autobild.de,computerbild.de,bild.de,tomshardware.com##+js(adshield, error-report.com)
+autobild.de,computerbild.de,bild.de,tomshardware.com,notebookcheck.com##+js(adshield, error-report.com)
 
 ! bild.de sets its wall flag during hydration, out of reach of a response-body rewrite
 ! uBO's inline-script layer names an alias that is not vendored here and silently no-ops, so it is re-stated under the canonical name
@@ -252,5 +252,9 @@ fussballdaten.de##.ad-label-holder
 
 ! 2026-08-16 prisma.de: a 970x300 placeholder with zero children — nothing in it at all
 prisma.de##.ads-with-placeholder
+
+! 2026-08-16 ran.de: three 1032x330 boxes labelled "- Anzeige -", each holding nothing but an empty ad slot
+! Keyed on the slot id `ran_D_*` via :has(), not on the MUI emotion hash that is the box's only class
+ran.de##div:has(> div > div[id^="ran_D_"])
 
 ! END: empty ad slots left behind
