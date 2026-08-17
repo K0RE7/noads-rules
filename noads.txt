@@ -183,7 +183,7 @@ hbr.org##[class*="AdSlotZone"][class*="ad-container"]
 theverge.com##.m-ad
 
 ! 2026-08-16 aol.com: the video.js IMA3 ad container renders 543x407 and EMPTY once its ad is blocked, over the player
-aol.com##.vjs-ima3-ad-container
+aol.com,aol.de##.vjs-ima3-ad-container
 
 ! 2026-08-16 cnet.com, speedtest.net: the AdChoices floating button outlives its ad as a 27x25 fixed icon
 cnet.com,speedtest.net###zdcFloatingBtn
@@ -213,7 +213,7 @@ sport1.de##.s1-ad-container
 rtl.de##[class^="AdSlot_outbrainWrapper"]
 
 ! 2026-08-16 foodnetwork.com: two 1425x64 ad modules, painted, no content
-foodnetwork.com##.module--ad-module-primary
+foodnetwork.com,foodnetwork.co.uk##.module--ad-module-primary
 
 ! 2026-08-16 nicovideo.jp: a 316x266 slot with zero children — the emptiest box in the corpus
 nicovideo.jp###pc_uni_top_300x250_east
@@ -255,6 +255,6 @@ prisma.de##.ads-with-placeholder
 
 ! 2026-08-16 ran.de: three 1032x330 boxes labelled "- Anzeige -", each holding nothing but an empty ad slot
 ! Keyed on the slot id `ran_D_*` via :has(), not on the MUI emotion hash that is the box's only class
-ran.de##div:has(> div > div[id^="ran_D_"])
+ran.de,ran.joyn.de##div:has(> div > div[id^="ran_D_"])
 
 ! END: empty ad slots left behind
