@@ -40,6 +40,8 @@ https://raw.githubusercontent.com/K0RE7/noads-rules/main/noads.txt
 | 📰 &nbsp;**First-party & native ads** | Cosmetic rules for ad slots served from the publisher's own domain, where a network rule can't reach. |
 | 🩹 &nbsp;**Surrogates** | Neutered stand-ins for tracker scripts whose absence breaks the page. |
 | 🔧 &nbsp;**Unbreak** | Narrow exceptions where a block broke real functionality. |
+| 💧 &nbsp;**Client-rendered slots** | Domain cosmetics for slots whose class arrives at hydration, so a generic `##` rule never injects. |
+| 📦 &nbsp;**Empty leftover slots** | Hides for reserved boxes that survive with the creative blocked — the publisher keeps the space, the reader gets a hole. |
 
 <br>
 

@@ -1,11 +1,11 @@
 ! Title: NoAds Rules
-! Last modified: 2026-08-17
+! Last modified: 2026-08-18
 ! Description: Gaps the big public lists do not cover, to be used along EasyList
 ! Homepage: https://github.com/K0RE7/noads-rules
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
-! Version: 20260817
+! Version: 20260818
 ! Expires: 1 day
-! Rules: 81
+! Rules: 82
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -256,5 +256,8 @@ prisma.de##.ads-with-placeholder
 ! 2026-08-16 ran.de: three 1032x330 boxes labelled "- Anzeige -", each holding nothing but an empty ad slot
 ! Keyed on the slot id `ran_D_*` via :has(), not on the MUI emotion hash that is the box's only class
 ran.de,ran.joyn.de##div:has(> div > div[id^="ran_D_"])
+
+! 2026-08-18 forbes.pl: 5 reserved boxes, all labelled "REKLAMA", all empty
+forbes.pl##.placeholder.wide
 
 ! END: empty ad slots left behind
