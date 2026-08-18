@@ -1,94 +1,107 @@
-<div align="center">
-
 # NoAds Rules
 
-### Filter rules for the gaps the big lists leave
+An additive [Adblock Plus](https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters) filter list for gaps that EasyList, EasyPrivacy, [uBlock Origin uAssets](https://github.com/uBlockOrigin/uAssets) and [AdGuard German](https://github.com/AdguardTeam/AdguardFilters) do not cover.
 
-[![License](https://img.shields.io/badge/license-GPL--3.0-2f81f7?style=flat-square)](LICENSE)
-[![Syntax](https://img.shields.io/badge/syntax-Adblock%20Plus-6e7681?style=flat-square)](#subscribe)
-[![Refresh](https://img.shields.io/badge/refresh-daily-238636?style=flat-square)](#subscribe)
-[![Scope](https://img.shields.io/badge/scope-additive-8957e5?style=flat-square)](#subscribe)
-
-<sub>Measured against real browsers · written to shrink · no telemetry, no dependencies</sub>
-
-</div>
-
-<br>
-
-## Subscribe
+It is small on purpose. Every rule was measured against a live page before it was added. When an upstream list starts covering a rule, the rule is deleted here.
 
 ```
 https://raw.githubusercontent.com/K0RE7/noads-rules/main/noads.txt
 ```
 
-<sub>**uBlock Origin** → Settings → Filter lists → Import…&nbsp;&nbsp;·&nbsp;&nbsp;**AdGuard** → Filters → Custom&nbsp;&nbsp;·&nbsp;&nbsp;or anything else that reads Adblock Plus syntax</sub>
+Subscribe in uBlock Origin (Settings → Filter lists → Import), AdGuard (Filters → Custom), or any other blocker that reads Adblock Plus syntax. **Do not use this list by itself.** Almost every rule assumes the lists above are already loaded.
 
-> [!IMPORTANT]
-> **Add this alongside your usual lists, never instead of them.** It is a supplement to
-> EasyList, EasyPrivacy, [uAssets](https://github.com/uBlockOrigin/uAssets) and AdGuard German
-> — on its own it blocks almost nothing, because every rule assumes those are already doing
-> the heavy lifting.
+Header fields: `Expires: 1 day`. Current size is in the `! Rules:` line of [`noads.txt`](noads.txt).
 
-<br>
+## What the list covers
 
-## What's in it
+The file is split into dated sections. A `! START` / `! END` pair marks each one.
 
-|  | |
-|---|---|
-| 🎯 &nbsp;**Ad-tech overrides** | `$important` re-assertions where an upstream `@@` exception leaves a real ad loading — plus provider ad-tech that upstream blocks third-party-only, and so misses when a publisher serves it first-party. |
-| 🧱 &nbsp;**Anti-adblock walls** | Rules that keep a page readable when the publisher detects a blocker. Keyed on the wall *vendor* wherever possible, so one rule covers every site embedding it. |
-| 📰 &nbsp;**First-party & native ads** | Cosmetic rules for ad slots served from the publisher's own domain, where a network rule can't reach. |
-| 🩹 &nbsp;**Surrogates** | Neutered stand-ins for tracker scripts whose absence breaks the page. |
-| 🔧 &nbsp;**Unbreak** | Narrow exceptions where a block broke real functionality. |
-| 💧 &nbsp;**Client-rendered slots** | Domain cosmetics for slots whose class arrives at hydration, so a generic `##` rule never injects. |
-| 📦 &nbsp;**Empty leftover slots** | Hides for reserved boxes that survive with the creative blocked — the publisher keeps the space, the reader gets a hole. |
+### Ad-tech the upstream lists under-block
 
-<br>
+Network rules for hosts that still serve ads or trackers after the usual lists have run.
 
-## What a rule looks like
+Typical cases:
 
-Every rule is measured against a real browser before it ships — a live render, an upstream
-exception caught misfiring, a wall observed in the wild. Nothing goes in because a selector
-looked ad-shaped, and each cluster says what was measured:
+- An upstream `@@` exception lets a real ad script load (GPT `pubads_impl_`, GPT loader, Integral Ad Science, Condé Nast's ad CDN, Taboola, Magnite, DoubleVerify).
+- Upstream blocks the host third-party-only (`$3p`), so a first-party or CNAME serve slips through (Comscore, AdsWizz, Cxense).
+- A publisher ad server that no list names at all (`ad.meine-vrm.de`, `mantis-awx.com`).
+
+`$important` is used only to beat a specific upstream exception. It is omitted when a redirect stub or a narrower exception must keep winning — see the Comscore and AdsWizz comments in the list.
+
+### Anti-adblock walls
+
+Rules that keep the article readable when the publisher detects a blocker.
+
+Vendor infrastructure is blocked at the host (`html-load.com`, `content-loader.com`, `css-load.com`, `error-report.com`) so one rule covers every site embedding that SaaS. Where removing the loader tag *is* the wall trigger, the tag stays and a scriptlet denies the watchdog the primitives it needs instead.
+
+A cosmetic-only nag (the page is already readable) is hidden, not treated as a wall.
+
+### First-party and native ad slots
+
+Cosmetic rules for slots served from the publisher's own origin, where a network rule cannot tell an ad from editorial. Selectors are keyed on the publisher's own ad badge, `data-ad-*` attribute, or a class that is literally named for ads.
+
+`:has()` is used when the ad is an `<article>` that only becomes identifiable through a child badge (Burda's "Anzeige" teasers). CSS-module hashes are matched on the stable fragments either side of the hash, not on the hash itself.
+
+### Surrogate redirects
+
+Two tracker scripts initialise inside their own `onload`. A blocked-but-successful response still fires `load`, and the page throws (`UET is not defined`, `nol_t is not defined`).
 
 ```
-! 2026-07-05: Comscore's beacon leaks when a publisher serves it first-party — upstream is third-party-only
-! Deliberately not $important: the beacon.js redirect stub must keep winning, or COMSCORE.beacon() callers throw
-||scorecardresearch.com^
+||bat.bing.com/bat.js$script,redirect=noads_bing_uet.js
+||imrworldwide.com/v60.js$script,redirect=noads_nielsen.js
 ```
 
-<sub>The longer working notes — DOM match counts, deobfuscated wall scripts, rejected alternatives — stay with the sources. Open an issue if you want the reasoning behind a particular rule.</sub>
+The stubs are no-ops: same zero tracking data as a block, without the throw. They are NoAds resources. In uBlock Origin / AdGuard these two lines do nothing unless you also define those redirect names.
 
-<br>
+### Unbreak
 
-## Contributing
+Two upstream `$other` exceptions that, in practice, were exempting iframes. Restated with `$subdocument` on the same host, path and `domain=` scope — no new site is exempted.
 
-> [!TIP]
-> **The best contribution is one that never reaches this list.**
+```
+@@||tpc.googlesyndication.com/safeframe/*/container.html$subdocument,domain=abola.pt
+@@||ad3.adfarm1.adition.com^$subdocument,domain=servustv.com
+```
 
-Every rule here is a gap in somebody else's list, and that is where the fix belongs:
+### Client-rendered slots
 
-| If it's… | Send it to |
-|---|---|
-| a generic ad or tracker to block | [**EasyList / EasyPrivacy**](https://github.com/easylist/easylist/issues) |
-| a site fix, anti-adblock wall, or scriptlet | [**uBlock Origin uAssets**](https://github.com/uBlockOrigin/uAssets/issues) |
-| a German-language site | [**AdGuard Filters**](https://github.com/AdguardTeam/AdguardFilters/issues) |
+Domain cosmetics (`site##selector`) for slots whose class or id is added at hydration. A generic `##.m-ad` never injects if the served HTML never carries that token; a domain rule injects unconditionally and reaches the live node.
 
-A rule that lands upstream reaches every ad blocker on every platform; a rule that lands here
-reaches whoever happened to subscribe. **This list is meant to shrink** — when upstream starts
-covering a rule, it gets deleted here rather than left to rot.
+### Empty leftover slots
 
-Open an issue here if upstream declined it or went quiet, if a rule in this list is wrong or
-overblocking, or if you're unsure where something belongs. A useful report is the site, what
-you saw, and the offending element's markup or a screenshot.
+Cosmetic hides for boxes the publisher reserved in its own markup. After the creative is blocked the box is still there — labelled "Advertisement" / "Anzeige" / "REKLAMA", painted, and empty.
 
-<br>
+A rule is written only when a live check shows the node is an ad reservation and not a layout wrapper or the publisher's own product module. `uol.com.br`'s `.cardProducts` is the worked example of a reject: it is filled with UOL Host / PagBank, not an ad we blocked.
+
+## Syntax and conventions
+
+- **Syntax:** Adblock Plus, plus the uBlock Origin extensions this list actually uses (`$important`, `$redirect`, `##+js(...)`, `$doc,replace=`, `:has()`).
+- **Comments:** every cluster has a dated `!` line stating the site, what was measured, and why the rule exists. That is what makes a rule reviewable later, and what makes it deletable when upstream catches up.
+- **Prefer the vendor over the site.** `||html-load.com^` beats a per-publisher copy of the same wall.
+- **Cosmetic rules are domain-scoped.** A selector is tied to the host the document is served from, not to a class name claimed generically.
+- **No annoyance / cookie / social lists.** Those are out of scope.
+
+Most rules are ordinary network and cosmetic filters and work in any ABP-compatible blocker. A handful are NoAds-specific and are inert elsewhere:
+
+| Kind | In this list | Needs |
+| --- | --- | --- |
+| `+js(adshield, …)` | Ad-Shield watchdog on Axel Springer / Tom's Hardware / Notebookcheck | the NoAds `adshield` scriptlet |
+| `redirect=noads_bing_uet.js`, `redirect=noads_nielsen.js` | Bing UET and Nielsen stubs | those two NoAds redirect bodies |
+| `+js(replace-node-text, …)` and `$doc,replace=` | bild.de wall flag / destroy-fn | uBO (or NoAds) scriptlet / replace support |
+
+## Reporting a gap or a bad rule
+
+The best fix is one that never lands here. Send generic ads and trackers to [EasyList / EasyPrivacy](https://github.com/easylist/easylist/issues), site fixes / walls / scriptlets to [uAssets](https://github.com/uBlockOrigin/uAssets/issues), and German-language sites to [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters/issues). A rule that lands upstream reaches every blocker; a rule that lands here reaches this list's subscribers.
+
+Open an [issue](https://github.com/K0RE7/noads-rules/issues) here if:
+
+- upstream declined it or went quiet
+- a rule in this list is wrong, over-broad, or now redundant
+- you are unsure where something belongs
+
+A useful report is the site, what you saw, and the offending element's markup or a screenshot. Pull requests against `noads.txt` are welcome for obvious fixes; new rules need the dated measurement comment or they will be rejected.
 
 ## About
 
-Maintained alongside NoAds, a local ad blocker for Windows that isn't public yet. This list is
-plain filter data with no dependency on it — anyone can subscribe today.
+Maintained alongside NoAds, a local consent-based ad blocker that is not public yet. The list is plain filter data. You do not need NoAds to subscribe.
 
-<div align="center">
-<sub><strong>GPL-3.0</strong> · matching the uAssets and EasyList convention, so rules can move freely in either direction</sub>
-</div>
+[GPL-3.0](LICENSE), matching the EasyList and uAssets convention so a rule can move in either direction without a licence fight.
