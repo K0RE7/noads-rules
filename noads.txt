@@ -13,7 +13,6 @@
 ! upstream list starts covering a rule, the rule gets deleted here.
 !
 ! GitHub issues: https://github.com/K0RE7/noads-rules/issues
-! GitHub pull requests: https://github.com/K0RE7/noads-rules/pulls
 
 ! START: ad-tech the upstream lists under-block
 

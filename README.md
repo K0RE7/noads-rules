@@ -137,7 +137,7 @@ A rule that lands upstream reaches every blocker. A rule that lands here reaches
 
 Open an [issue](https://github.com/K0RE7/noads-rules/issues) here if upstream declined it or went quiet, if a rule in this list is wrong, over-broad, or now redundant, or if you are unsure where something belongs.
 
-A useful report is the site, what you saw, and the offending element's markup or a screenshot. Pull requests against `noads.txt` are welcome for obvious fixes; new rules need the dated measurement comment or they will be rejected.
+A useful report is the site, what you saw, and the offending element's markup or a screenshot. Issues are welcome. Pull requests will not be accepted.
 
 ---
 
