@@ -1,11 +1,11 @@
 ! Title: NoAds Rules
-! Last modified: 2026-08-18
+! Last modified: 2026-08-19
 ! Description: Gaps the big public lists do not cover, to be used along EasyList
 ! Homepage: https://github.com/K0RE7/noads-rules
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
-! Version: 20260818
+! Version: 20260819
 ! Expires: 1 day
-! Rules: 82
+! Rules: 83
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -172,6 +172,10 @@ hbr.org##[class*="AdSlotZone"][class*="ad-container"]
 ! Re-stated with the correct type — same host, same path shape, same domain= scope, so no new site is exempted
 @@||tpc.googlesyndication.com/safeframe/*/container.html$subdocument,domain=abola.pt
 @@||ad3.adfarm1.adition.com^$subdocument,domain=servustv.com
+
+! 2026-08-19: first-id.fr is a top-level NAVIGATION hop, not just a tracker sub-resource
+! Blocking it left capital.fr and sudouest.fr as blank white pages; the negated types keep its script/image/xhr blocked
+@@||first-id.fr^$~script,~image,~xmlhttprequest
 
 ! END: unbreak
 
