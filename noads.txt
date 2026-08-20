@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260819
 ! Expires: 1 day
-! Rules: 83
+! Rules: 88
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -69,6 +69,18 @@
 ! 2026-07-05: upstream @@-exempts Cxense/Piano's cx.js per publisher (mega.cl, itmedia.co.jp, elconfidencial.com, journaldemontreal.com)
 ! and softens the domain rule to $3p, so cdn. first-party is missed
 ||cdn.cxense.com^$important
+
+! 2026-08-19 soccersuck.com: adsabay.com is an ad server no shipped list covers — 810 KB over 15 requests, creatives up to 588 KB
+! Blocking the loader stops the other 14 requests and costs the page nothing: body text 341 -> 339 chars, DOM 8,274 -> 8,246 nodes
+||adsabay.com^
+
+! 2026-08-19 auction.co.kr: ad-img.gmarket.com serves display creatives under /ADS/ and no shipped list covers it — 114 KB over 2 hits
+! Path-scoped deliberately: the host is in the site's own corporate group, and the product imagery comes from image.gmarket.co.kr
+||ad-img.gmarket.com/ADS/
+
+! 2026-08-19 inews.id: analytics.mncplus.com is MNC's own analytics SDK — mncanalytics.min.js plus POST beacons, uncovered by every list
+! Blocking it changes nothing visible: body text, article text, painted images, links and paragraphs are all identical with and without it
+||analytics.mncplus.com^
 
 ! END: ad-tech the upstream lists under-block
 
@@ -262,5 +274,12 @@ ran.de,ran.joyn.de##div:has(> div > div[id^="ran_D_"])
 
 ! 2026-08-18 forbes.pl: 5 reserved boxes, all labelled "REKLAMA", all empty
 forbes.pl##.placeholder.wide
+
+! 2026-08-20 dailynorseman.com, sbnation.com: 12 painted ad containers per page, largest 1249x60, the rest 700x66 — all completely empty
+! Vox Media "duet", the same `.m-ad` anchor already shipped for theverge.com; measured on two SB Nation titles, not assumed from one
+dailynorseman.com,sbnation.com##.m-ad
+
+! 2026-08-20 leki.pl: 8 painted 338x293 ad-server banner blocks, every one labelled "Reklama" and holding nothing
+leki.pl##.adserver-banner-block
 
 ! END: empty ad slots left behind
