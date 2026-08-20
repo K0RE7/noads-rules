@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260820
 ! Expires: 1 day
-! Rules: 104
+! Rules: 105
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -287,6 +287,9 @@ leki.pl##.wp-block-column:has(> .polecane-reklama)
 
 ! 2026-08-20 gazzetta.gr, insider.gr: DFP tag containers left reserved and empty, largest 1425x250
 gazzetta.gr,insider.gr##[id^="block-dfptag"]
+
+! 2026-08-20 gazzetta.gr: a 300x110 empty ad tile sitting among the live match tiles in the ticker
+gazzetta.gr##div.match.ad
 
 ! 2026-08-20 politika.rs: 5 painted ad placeholders, largest 1425x301, all empty
 politika.rs##.desktop-ad-placeholder
