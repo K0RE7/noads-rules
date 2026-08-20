@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260820
 ! Expires: 1 day
-! Rules: 89
+! Rules: 104
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -282,5 +282,52 @@ dailynorseman.com,sbnation.com##.m-ad
 ! 2026-08-20 leki.pl: 8 painted 338x293 ad-server banner blocks, every one labelled "Reklama" and holding nothing
 leki.pl##.adserver-banner-block
 leki.pl##.wp-block-column:has(> .polecane-reklama)
+
+! 2026-08-20 the mcrecheck empty-slot bucket — 16 sites, every selector measured LIVE
+
+! 2026-08-20 gazzetta.gr, insider.gr: DFP tag containers left reserved and empty, largest 1425x250
+gazzetta.gr,insider.gr##[id^="block-dfptag"]
+
+! 2026-08-20 politika.rs: 5 painted ad placeholders, largest 1425x301, all empty
+politika.rs##.desktop-ad-placeholder
+
+! 2026-08-20 mindluster.com: 6 painted 1425x170 ad slots between the home sections, all empty
+mindluster.com##.v2-ad-slot
+
+! 2026-08-20 diariodecadiz.es, laregion.es: reserved "board-advertising" boxes, largest 352x693
+diariodecadiz.es,laregion.es##.board-advertising
+
+! 2026-08-20 clicrbs.com.br: 3 painted 402x254 rectangle slots, all empty
+clicrbs.com.br##.slot-retangulo-medio
+
+! 2026-08-20 leboncoin.fr: a 1425x264 header-bidding slot holding nothing
+leboncoin.fr##.apn-hb
+
+! 2026-08-20 adformatie.nl: 4 painted ad slots, largest 1146x52, each showing only its label
+adformatie.nl##.c-ad-slot
+
+! 2026-08-20 mgtv.com: 2 painted 384x334 feed ads, both empty
+mgtv.com##.feed-ad
+
+! 2026-08-20 h1g.jp: a 904x124 main-body ad strip holding nothing
+h1g.jp##.ad-mainbody
+
+! 2026-08-20 ig.com.br: a 285x270 sponsored-video box, empty; three nested wrappers all collapse
+ig.com.br###ad_sponsor_video
+
+! 2026-08-20 demotywatory.pl: a 300x600 sky banner, empty
+demotywatory.pl###dmty-sky-right
+
+! 2026-08-20 demotywatory.pl: 4 more ad boxes shaped exactly like the site's own posts
+demotywatory.pl##article:has(> div.demotivator:not([id]))
+
+! 2026-08-20 sport1.de: a 1041x164 native-ad box whose reserved space is held by its GRANDPARENT
+sport1.de##div:has(> div > #pinpoll-native-ad)
+
+! 2026-08-20 diretta.it: a 156x260 ad zone in the left menu, empty
+diretta.it##div.banner:has(> [id^="zoneContainer-"])
+
+! 2026-08-20 squaremeal.co.uk: a 1425x74 strip whose only content is the word "ADVERTISEMENT"
+squaremeal.co.uk##div#MainContent_pnlDynamicHomeControl > div.bg-light.py-4
 
 ! END: empty ad slots left behind
