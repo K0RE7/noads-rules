@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260820
 ! Expires: 1 day
-! Rules: 105
+! Rules: 106
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -188,6 +188,10 @@ hbr.org##[class*="AdSlotZone"][class*="ad-container"]
 ! 2026-08-19: first-id.fr is a top-level NAVIGATION hop, not just a tracker sub-resource
 ! Blocking it left capital.fr and sudouest.fr as blank white pages; the negated types keep its script/image/xhr blocked
 @@||first-id.fr^$~script,~image,~xmlhttprequest
+
+! 2026-08-20: EasyList's ||brightline.tv^$third-party blocks the Brightline player's config, and the player retries it forever
+! Measured on cnn.com: 13,061 requests to one URL in 25s (~520/s), all ERR_FAILED -- the page never idles and screenshots time out
+@@||cdn-media.brightline.tv/config/v*.json
 
 ! END: unbreak
 
