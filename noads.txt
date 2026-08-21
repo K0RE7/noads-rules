@@ -5,7 +5,7 @@
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
 ! Version: 20260821
 ! Expires: 1 day
-! Rules: 107
+! Rules: 113
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -340,5 +340,27 @@ diretta.it##div.banner:has(> [id^="zoneContainer-"])
 
 ! 2026-08-20 squaremeal.co.uk: a 1425x74 strip whose only content is the word "ADVERTISEMENT"
 squaremeal.co.uk##div#MainContent_pnlDynamicHomeControl > div.bg-light.py-4
+
+! 2026-08-21 the deus500 empty-slot bucket — 6 sites, every selector verified LIVE through NoAds
+
+! 2026-08-21 harpersbazaar.de: 6 reserved slots, 500/500/300/300/300/300, an eighth of the page held blank
+! The container is transparent; what the reader sees is the child "Anzeige" label and a faint BAZAAR watermark in the hole
+harpersbazaar.de##[class*="ad_placement"]
+
+! 2026-08-21 bildderfrau.de: 6 Pimcore advertisement bricks, the first 280x1108 and painted blank, the rest already at 0-15px
+bildderfrau.de##.pimcore_area_advertisement
+
+! 2026-08-21 vienna.at: 10 ad boxes, three holding 250/204/250 px open, all three above the fold
+! The top one pushes the site's own masthead down by a quarter-screen before any content appears
+vienna.at##.vodl-ad
+
+! 2026-08-21 theleader.com.au: a 1425x274 grey billboard band above the masthead, holding a 2-character "Ad" chip
+theleader.com.au##div#billboard-container
+
+! 2026-08-21 stockhead.com.au: a 1425x162 band above the masthead whose only content is a CSS ::after "ADVERTISEMENT"
+stockhead.com.au##div#masthead_promo
+
+! 2026-08-21 thansettakij.com: a 1300x90 grey in-article strip above the "latest news" heading
+thansettakij.com##[class*="ads-inarticle"]
 
 ! END: empty ad slots left behind
