@@ -1,11 +1,11 @@
 ! Title: NoAds Rules
-! Last modified: 2026-08-20
+! Last modified: 2026-08-21
 ! Description: Gaps the big public lists do not cover, to be used along EasyList
 ! Homepage: https://github.com/K0RE7/noads-rules
 ! License: https://github.com/K0RE7/noads-rules/blob/main/LICENSE
-! Version: 20260820
+! Version: 20260821
 ! Expires: 1 day
-! Rules: 106
+! Rules: 107
 !
 ! Additive: layer this on top of EasyList, EasyPrivacy, uBlock Origin's uAssets and
 ! AdGuard German, never instead of them. Every rule was measured against a live
@@ -81,6 +81,10 @@
 ! 2026-08-19 inews.id: analytics.mncplus.com is MNC's own analytics SDK — mncanalytics.min.js plus POST beacons, uncovered by every list
 ! Blocking it changes nothing visible: body text, article text, painted images, links and paragraphs are all identical with and without it
 ||analytics.mncplus.com^
+
+! 2026-08-21 ann-so.com/phimsexgg.pro: ads.bizwd.net fills a full-screen ad interstitial plus two leaderboards, and no list covers it here
+! AdGuard's Vietnamese list already carries ||ads.bizwd.net^$image — the intent is settled, the rule is just pinned to one unrelated domain
+||ads.bizwd.net^$third-party
 
 ! END: ad-tech the upstream lists under-block
 
